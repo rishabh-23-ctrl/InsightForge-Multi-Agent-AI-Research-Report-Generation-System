@@ -47,8 +47,8 @@ pip install -r requirements.txt
 Create a `.env` file in the root directory:
 
 ```bash
-# Get API key from https://www.together.ai/
-TOGETHER_API_KEY=your_together_api_key_here
+# Get API key from https://console.groq.com/
+GROQ_API_KEY=your_groq_api_key_here
 
 # Get API key from https://tavily.com/
 TAVILY_API_KEY=your_tavily_api_key_here
@@ -56,7 +56,7 @@ TAVILY_API_KEY=your_tavily_api_key_here
 
 **Getting API Keys:**
 
-1. **Together AI**: Sign up at [together.ai](https://www.together.ai/) and create an API key
+1. **Groq**: Sign up at https://console.groq.com/ and create an API key
 2. **Tavily**: Sign up at [tavily.com](https://tavily.com/) and get your API key
 
 ### Step 4: (Optional) Install Graphviz for Visualization
@@ -142,8 +142,8 @@ pip install -r requirements.txt --upgrade
 - Check that API keys are correct and active
 - Ensure no extra spaces in the `.env` file
 
-**3. Together AI Connection Issues**
-- The code uses Together AI's OpenAI-compatible endpoint
+**3. Groq Connection Issues**
+- Make sure your `GROQ_API_KEY` is correctly configured in your `.env` file.
 - Ensure your API key has sufficient credits
 - Check network connectivity
 
