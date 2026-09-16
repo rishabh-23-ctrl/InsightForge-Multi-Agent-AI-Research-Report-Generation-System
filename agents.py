@@ -96,13 +96,23 @@ def create_supervisor_chain():
             }
         
         # 3. If we have research but no draft, create first draft
+        if has_research and not state.get("evidence_analysis"):
+
+            print("Supervisor: Research available, sending to Evidence Analyzer")
+
+            return {
+                "next_step": "evidence_analyzer",
+                "task_description": "Analyze and evaluate the research evidence"
+            }
+
         if has_research and not has_draft:
-            print("Supervisor: Have research, creating first draft")
+
+            print("Supervisor: Evidence analyzed, creating first draft")
+
             return {
                 "next_step": "writer",
-                "task_description": "Write the first draft based on research findings"
+                "task_description": "Write the first draft based on research and evidence analysis"
             }
-        
         # 4. If we have a draft but no critique yet, send to critiquer
         if has_draft and not critique:
             print("Supervisor: Have draft, sending to critiquer")
@@ -249,7 +259,58 @@ Format as clear bullet points with the most important information."""
             }
     
     return researcher_invoke
+def create_evidence_analyzer_agent():
+    """Create an agent that analyzes and evaluates research evidence."""
 
+    def evidence_analyzer(state):
+        research_findings = state.get("research_findings", [])
+
+        if not research_findings:
+            return {
+                "output": "No research findings available for evidence analysis."
+            }
+
+        findings_text = "\n\n".join(
+            str(finding) for finding in research_findings
+        )
+
+        prompt = f"""
+You are an Evidence Analyzer Agent in a multi-agent research system.
+
+Research Topic:
+{state.get("main_task", "")}
+
+Research Findings:
+{findings_text}
+
+Analyze the research evidence and produce a structured evidence assessment.
+
+Your analysis should:
+1. Identify the most important claims and findings.
+2. Distinguish strong evidence from weaker or uncertain evidence.
+3. Identify supporting sources when available.
+4. Point out contradictions or gaps in the evidence.
+5. Highlight important limitations or uncertainty.
+6. Provide concise conclusions that a research writer can use.
+
+Do not invent facts or sources.
+
+Return a clear, structured evidence analysis.
+"""
+
+        try:
+            response = llm.invoke(prompt)
+            response = response.content if hasattr(response, "content") else str(response)
+            return {
+                "output": response
+            }
+        except Exception as e:
+            print(f"Evidence analysis error: {e}")
+            return {
+                "output": "Evidence analysis could not be completed."
+            }
+
+    return evidence_analyzer
 # ----------------- #
 # WRITER NODE       #
 # ----------------- #

@@ -6,6 +6,7 @@ import operator
 from agents import (
     create_supervisor_chain,
     create_researcher_agent,
+    create_evidence_analyzer_agent,
     create_writer_chain,
     create_critique_chain
 )
@@ -16,6 +17,7 @@ class ResearchState(TypedDict):
     """State for the research workflow."""
     main_task: str
     research_findings: Annotated[List[str], operator.add]
+    evidence_analysis: str
     draft: str
     critique_notes: str
     revision_number: int
@@ -26,6 +28,7 @@ class ResearchState(TypedDict):
 
 supervisor_chain = create_supervisor_chain()
 researcher_agent = create_researcher_agent()
+evidence_analyzer_agent = create_evidence_analyzer_agent()
 writer_chain = create_writer_chain()
 critique_chain = create_critique_chain()
 
@@ -68,7 +71,25 @@ def research_node(state: ResearchState) -> dict:
     return {
         "research_findings": [findings]
     }
+    
+def evidence_analyzer_node(state: ResearchState) -> dict:
+    """Evidence Analyzer node that evaluates research findings."""
+    print("\n=== EVIDENCE ANALYZER ===")
 
+    try:
+        result = evidence_analyzer_agent(state)
+        analysis = result.get("output", "Evidence analysis completed")
+
+        print(f"Evidence analysis: {str(analysis)[:100]}...")
+
+    except Exception as e:
+        print(f"Evidence analysis error: {e}")
+        analysis = "Evidence analysis could not be completed."
+
+    return {
+        "evidence_analysis": analysis
+    }
+    
 def write_node(state: ResearchState) -> dict:
     """Writer node that creates or revises draft."""
     print("\n=== WRITER ===")
@@ -111,8 +132,10 @@ def build_graph():
     workflow = StateGraph(ResearchState)
     
     # Add nodes
+    # Add nodes
     workflow.add_node("supervisor", supervisor_node)
     workflow.add_node("researcher", research_node)
+    workflow.add_node("evidence_analyzer", evidence_analyzer_node)
     workflow.add_node("writer", write_node)
     workflow.add_node("critiquer", critique_node)
     
@@ -120,7 +143,10 @@ def build_graph():
     workflow.set_entry_point("supervisor")
     
     # Add edges
-    workflow.add_edge("researcher", "supervisor")
+    # Add edges
+# Add edges
+    workflow.add_edge("researcher", "evidence_analyzer")
+    workflow.add_edge("evidence_analyzer", "supervisor")
     workflow.add_edge("writer", "critiquer")
     workflow.add_edge("critiquer", "supervisor")
     
@@ -130,6 +156,7 @@ def build_graph():
         lambda state: state.get("next_step", "researcher"),
         {
             "researcher": "researcher",
+            "evidence_analyzer": "evidence_analyzer",
             "writer": "writer",
             "END": END
         }
