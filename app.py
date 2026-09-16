@@ -19,11 +19,11 @@ st.set_page_config(
 # --- Check for API Keys ---
 def check_api_keys():
     """Check if required API keys are present."""
-    together_key = os.environ.get("TOGETHER_API_KEY")
+    groq_key = os.environ.get("GROQ_API_KEY")
     tavily_key = os.environ.get("TAVILY_API_KEY")
-    
-    if not together_key or not tavily_key:
-        st.error("🚨 API keys not found! Please set TOGETHER_API_KEY and TAVILY_API_KEY in your .env file.")
+
+    if not groq_key or not tavily_key:
+        st.error("🚨 API keys not found! Please set GROQ_API_KEY and TAVILY_API_KEY in your .env file.")
         return False
     
     st.success("✅ API keys loaded successfully.")
@@ -296,6 +296,6 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
 st.divider()
 st.markdown("""
 <div style='text-align: center; color: gray;'>
-    <p>Powered by LangChain, LangGraph, Together AI & Tavily</p>
+    <p>Powered by LangChain, LangGraph, Groq & Tavily</p>
 </div>
 """, unsafe_allow_html=True)

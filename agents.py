@@ -3,7 +3,7 @@
 import os
 import json
 from dotenv import load_dotenv
-from langchain_together import ChatTogether
+from langchain_groq import ChatGroq
 from langchain_tavily import TavilySearch
 from prompts import (
     supervisor_prompt_template,
@@ -22,12 +22,13 @@ if not os.environ.get("TAVILY_API_KEY"):
 
 # --- 1. Setup LLM and Tools ---
 
-# Initialize the ChatTogether LLM (latest non-deprecated version)
-llm = ChatTogether(
-    model="mistralai/Mixtral-8x7B-Instruct-v0.1",
+
+# Initialize the Groq LLM
+llm = ChatGroq(
+    model="openai/gpt-oss-20b",
     temperature=0.3,
     max_tokens=4096,
-    together_api_key=os.environ.get("TOGETHER_API_KEY")
+    groq_api_key=os.environ.get("GROQ_API_KEY")
 )
 
 # Initialize the Tavily Search Tool (official method from docs)
