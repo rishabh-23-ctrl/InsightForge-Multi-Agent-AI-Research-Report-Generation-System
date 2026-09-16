@@ -1,5 +1,5 @@
 def main():
-    print("Hello from multi-agent-ai-research!")
+    print("Welcome to InsightForge!")
 
 
 if __name__ == "__main__":
