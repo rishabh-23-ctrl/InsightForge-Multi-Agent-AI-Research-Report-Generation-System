@@ -1,7 +1,7 @@
 [project]
-name = "multi-agent-ai-research"
+name = "insightforge"
 version = "0.1.0"
-description = "Add your description here"
+description = "Multi-Agent AI Research and Report Generation System"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
