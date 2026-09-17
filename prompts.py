@@ -43,6 +43,9 @@ Main Task: {main_task}
 Research Findings:
 {research_findings}
 
+Evidence Analysis:
+{evidence_analysis}
+
 Current Draft: {draft}
 
 Critique Notes: {critique_notes}

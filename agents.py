@@ -319,10 +319,15 @@ def create_writer_chain():
     def writer_invoke(state):
         research = state.get("research_findings", [])
         research_text = "\n\n".join(research) if research else "No research available."
+        evidence_analysis = state.get(
+            "evidence_analysis",
+            "No evidence analysis available."
+        )
         
         prompt = writer_prompt_template.format(
             main_task=state.get("main_task", ""),
             research_findings=research_text,
+            evidence_analysis=evidence_analysis,
             draft=state.get("draft", ""),
             critique_notes=state.get("critique_notes", "")
         )
