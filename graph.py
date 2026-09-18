@@ -17,6 +17,7 @@ class ResearchState(TypedDict):
     """State for the research workflow."""
     main_task: str
     research_findings: Annotated[List[str], operator.add]
+    sources: Annotated[List[str], operator.add]
     evidence_analysis: str
     draft: str
     critique_notes: str
@@ -66,10 +67,12 @@ def research_node(state: ResearchState) -> dict:
         print(f"Found: {str(findings)[:100]}...")
     except Exception as e:
         print(f"Research error: {e}")
+        result = {"sources": []}
         findings = f"Research on {sub_task} - information gathered"
     
     return {
-        "research_findings": [findings]
+        "research_findings": [findings],
+        "sources": result.get("sources", [])
     }
     
 def evidence_analyzer_node(state: ResearchState) -> dict:

@@ -221,14 +221,25 @@ def create_researcher_agent():
             # Format the results
             formatted_results = []
             
+            sources = []
+
             if results:
                 for result in results[:3]:
                     title = result.get('title', 'Untitled')
                     url = result.get('url', 'N/A')
                     content = result.get('content', '')
-                    formatted_results.append(f"**{title}**\nSource: {url}\n{content[:300]}...\n")
-                
+
+                    if url != 'N/A':
+                        sources.append(url)
+
+                    formatted_results.append(
+                        f"**{title}**\n"
+                        f"Source: {url}\n"
+                        f"{content[:300]}...\n"
+                    )
+
                 raw_output = "\n---\n".join(formatted_results)
+
             elif not raw_output:
                 raw_output = "No results found"
             
@@ -248,7 +259,8 @@ Format as clear bullet points with the most important information."""
             
             return {
                 "output": summary if summary else raw_output,
-                "input": query
+                "input": query,
+                "sources": sources
             }
             
         except Exception as e:
@@ -259,6 +271,7 @@ Format as clear bullet points with the most important information."""
             }
     
     return researcher_invoke
+
 def create_evidence_analyzer_agent():
     """Create an agent that analyzes and evaluates research evidence."""
 
@@ -319,28 +332,74 @@ def create_writer_chain():
     def writer_invoke(state):
         research = state.get("research_findings", [])
         research_text = "\n\n".join(research) if research else "No research available."
+
+        sources = state.get("sources", [])
+        sources_text = "\n".join(sources) if sources else "No sources available."
+
         evidence_analysis = state.get(
             "evidence_analysis",
             "No evidence analysis available."
         )
-        
-        prompt = writer_prompt_template.format(
-            main_task=state.get("main_task", ""),
-            research_findings=research_text,
-            evidence_analysis=evidence_analysis,
-            draft=state.get("draft", ""),
-            critique_notes=state.get("critique_notes", "")
-        )
-        
+
+        draft = state.get("draft", "")
+        critique_notes = state.get("critique_notes", "")
+
+        # First draft: use full research context
+        if not draft:
+            prompt = writer_prompt_template.format(
+                main_task=state.get("main_task", ""),
+                research_findings=research_text,
+                sources=sources_text,
+                evidence_analysis=evidence_analysis,
+                draft="",
+                critique_notes=""
+            )
+
+        # Revision: use only the existing draft + critique
+        else:
+            prompt = f"""
+You are the Writer Agent in a multi-agent research system.
+
+Research Topic:
+{state.get("main_task", "")}
+
+Current Draft:
+{draft}
+
+Critique Feedback:
+{critique_notes}
+
+Revise the current draft according to the critique feedback.
+
+Requirements:
+1. Preserve accurate information from the existing draft.
+2. Fix the specific issues identified by the critic.
+3. Do not invent facts or sources.
+4. Keep the report structured and professional.
+5. Include these sections where appropriate:
+   - Executive Summary
+   - Introduction
+   - Key Findings
+   - Evidence Analysis
+   - Detailed Analysis
+   - Limitations
+   - Conclusion
+   - Sources
+6. Return the complete revised report, not just the changes.
+"""
+
         try:
             response = _call_llm(llm, prompt)
             content = response.content if hasattr(response, 'content') else str(response)
+
             return content if content else "Draft in progress..."
+
         except Exception as e:
             print(f"Writer error: {e}")
             return "Error generating draft. Please try again."
-    
+
     return writer_invoke
+
 
 # ----------------- #
 # CRITIQUE NODE     #

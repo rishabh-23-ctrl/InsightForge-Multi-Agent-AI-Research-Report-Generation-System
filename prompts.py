@@ -43,6 +43,9 @@ Main Task: {main_task}
 Research Findings:
 {research_findings}
 
+Sources:
+{sources}
+
 Evidence Analysis:
 {evidence_analysis}
 

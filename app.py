@@ -127,7 +127,6 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
                     
                     # Store the complete state
                     all_states.append((node_name, node_output))
-                    final_state = node_output  # Keep updating final state
                     
                     # Display node output with expandable previews
                     with st.container():
@@ -209,11 +208,20 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
             # Update status when done
             status_placeholder.success("✅ Research Complete!")
             progress_bar.progress(1.0)
-            
+            # Reconstruct final state from all streamed node outputs
+            final_state = {}
+
+            for node_name, state in all_states:
+                if isinstance(state, dict):
+                    final_state.update(state)
             # Debug: Print final state info
             print(f"Final state type: {type(final_state)}")
             print(f"Final state keys: {final_state.keys() if isinstance(final_state, dict) else 'Not a dict'}")
             print(f"Draft exists: {bool(final_state.get('draft') if isinstance(final_state, dict) else False)}")
+            print(f"Sources collected: {len(final_state.get('sources', []))}")
+            print("Sources:")
+            for source in final_state.get("sources", []):
+                print(f"- {source}")
             print(f"Draft length: {len(final_state.get('draft', '')) if isinstance(final_state, dict) else 0}")
             
         except Exception as e:
@@ -225,6 +233,13 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
         # Display final report - IMPROVED LOGIC
         st.divider()
         
+        # Reconstruct useful final state from all node outputs
+        final_state = {}
+
+        for node_name, state in all_states:
+            if isinstance(state, dict):
+                final_state.update(state)
+                
         # Try to get the draft from final_state
         final_draft = None
         if final_state and isinstance(final_state, dict):
