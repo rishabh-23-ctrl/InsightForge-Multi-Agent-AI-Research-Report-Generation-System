@@ -11,10 +11,146 @@ load_dotenv()
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="Multi-Agent Research Assistant 🤖",
-    page_icon="🧠",
-    layout="wide"
+    page_title="InsightForge | AI Research",
+    page_icon="🔍",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
+
+# --- Custom UI Styling ---
+st.markdown("""
+<style>
+
+    /* Main application */
+    .stApp {
+        background-color: #f8fafc;
+    }
+
+    /* Main content width */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 1400px;
+    }
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #0f172a;
+    }
+
+    [data-testid="stSidebar"] * {
+        color: #e2e8f0;
+    }
+
+    /* Sidebar divider */
+    [data-testid="stSidebar"] hr {
+        border-color: #334155;
+    }
+
+    /* Main title */
+    .insightforge-title {
+        font-size: 3.2rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 0.2rem;
+    }
+
+    .insightforge-gradient {
+        background: linear-gradient(
+            90deg,
+            #2563eb,
+            #7c3aed
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .insightforge-subtitle {
+        font-size: 1.15rem;
+        color: #64748b;
+        margin-bottom: 2rem;
+    }
+
+    /* Workflow card */
+    .workflow-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1.2rem 1.5rem;
+        margin: 1rem 0 2rem 0;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .workflow-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+    }
+
+    .workflow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .agent {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.7rem 1rem;
+        text-align: center;
+        min-width: 130px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .arrow {
+        color: #94a3b8;
+        font-size: 1.2rem;
+    }
+
+    /* Section headings */
+    h1, h2, h3 {
+        color: #0f172a;
+    }
+
+    /* Buttons */
+    .stButton > button {
+        border-radius: 10px;
+        font-weight: 600;
+        min-height: 3rem;
+    }
+
+    /* Text input */
+    .stTextInput > div > div > input {
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        min-height: 3rem;
+    }
+
+    /* Metrics */
+    [data-testid="stMetric"] {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    /* Footer */
+    .insightforge-footer {
+        text-align: center;
+        color: #94a3b8;
+        padding: 1.5rem 0;
+        font-size: 0.9rem;
+    }
+
+</style>
+""", unsafe_allow_html=True)
 
 # --- Check for API Keys ---
 def check_api_keys():
@@ -23,45 +159,91 @@ def check_api_keys():
     tavily_key = os.environ.get("TAVILY_API_KEY")
 
     if not groq_key or not tavily_key:
-        st.error("🚨 API keys not found! Please set GROQ_API_KEY and TAVILY_API_KEY in your .env file.")
+        st.error(
+            "🚨 API keys not found! Please set "
+            "GROQ_API_KEY and TAVILY_API_KEY in your .env file."
+        )
         return False
-    
+
     st.success("✅ API keys loaded successfully.")
     return True
 
+
 # --- Header ---
-st.title("Multi-Agent Research Assistant 🤖🧠")
-st.markdown("""
-Welcome to your intelligent research assistant! 
-Enter a research topic, and a team of AI agents will collaborate to produce a comprehensive report.
+st.markdown("# 🔍 InsightForge")
 
-**Agent Team:**
-- 🎯 **Supervisor**: Manages the workflow and coordinates tasks
-- 🔍 **Researcher**: Gathers information using web search
-- ✍️ **Writer**: Creates and revises the research report
-- 🔎 **Critiquer**: Reviews drafts and provides feedback
-""")
+st.markdown(
+    "### Multi-Agent AI Research & Report Generation System"
+)
 
-st.divider()
+st.markdown(
+    "Research a topic and let a team of specialized AI agents "
+    "**research, analyze evidence, write, and refine** your report."
+)
 
+
+# --- Workflow Overview ---
+st.markdown("### ⚡ Autonomous Research Pipeline")
+
+workflow_cols = st.columns(5)
+
+agents = [
+    ("🎯", "Supervisor", "Coordinates"),
+    ("🔎", "Researcher", "Collects evidence"),
+    ("📊", "Evidence Analyzer", "Evaluates evidence"),
+    ("✍️", "Writer", "Generates report"),
+    ("🔍", "Critiquer", "Reviews quality")
+]
+
+for col, (icon, name, description) in zip(workflow_cols, agents):
+    with col:
+        st.info(
+            f"{icon} **{name}**\n\n"
+            f"{description}"
+        )
+
+st.caption(
+    "🔄 The Supervisor coordinates the pipeline and routes the report "
+    "through revision cycles until the Critiquer approves it."
+)
 
 # --- Check API Keys ---
 if not check_api_keys():
     st.stop()
 
-# --- Main Application ---
-st.header("🚀 Start Your Research")
 
-# User input
+st.divider()
+
+# --- Main Application ---
+
+st.markdown("## 🚀 Start Your Research")
+
+st.markdown(
+    "Enter a topic and let InsightForge research, evaluate evidence, "
+    "generate a report, and refine it automatically."
+)
+
 topic = st.text_input(
-    "Enter your research topic:",
+    "Research Topic",
     placeholder="e.g., Impact of quantum computing on cybersecurity",
     key="topic_input"
 )
 
-# Sidebar configuration
+st.markdown("")
+
+# --- Sidebar ---
 with st.sidebar:
-    st.header("⚙️ Configuration")
+
+    # Branding
+    st.markdown("## 🔍 InsightForge")
+
+    st.caption("AI Research Intelligence")
+
+    st.divider()
+
+    # Configuration
+    st.markdown("### ⚙️ Configuration")
+
     max_iterations = st.slider(
         "Max Workflow Iterations",
         min_value=5,
@@ -69,16 +251,33 @@ with st.sidebar:
         value=15,
         help="Maximum number of agent interactions"
     )
-    
+
     st.divider()
-    st.subheader("📋 How it works")
+
+    # Research Pipeline
+    st.markdown("### 🔄 Research Pipeline")
+
     st.markdown("""
-    1. **Supervisor** analyzes the task
-    2. **Researcher** gathers information
-    3. **Writer** creates a draft
-    4. **Critiquer** reviews quality
-    5. Loop continues until approved
+    🟢 **Supervisor**
+
+    🔵 **Researcher**
+
+    🟣 **Evidence Analyzer**
+
+    🟡 **Writer**
+
+    🔴 **Critiquer**
     """)
+
+    st.divider()
+
+    # About
+    st.markdown("### ℹ️ About")
+
+    st.caption(
+        "InsightForge uses specialized AI agents "
+        "to research, analyze, write, and refine reports."
+    )
 
 # Start button
 if st.button("🚀 Start Research", type="primary", use_container_width=True):
@@ -102,9 +301,9 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
         st.info("🤖 Agents are starting their work...")
         
         # Create containers for live updates
+        st.markdown("**Workflow Progress**")
         progress_bar = st.progress(0)
         status_placeholder = st.empty()
-        
         # Container for step-by-step progress
         progress_container = st.container()
         
@@ -115,7 +314,8 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
         try:
             # Stream the graph execution
             with progress_container:
-                st.subheader("🔄 Agent Activity Log")
+                st.markdown("### 🔄 Agent Activity")
+                st.caption("Live updates from the InsightForge research pipeline")
                 
                 for step in app.stream(initial_state, config=config):
                     step_count += 1
@@ -130,19 +330,26 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
                     
                     # Display node output with expandable previews
                     with st.container():
-                        col1, col2 = st.columns([3, 1])
-                        
+
+                        col1, col2 = st.columns([4, 1])
+
                         with col1:
-                            st.markdown(f"### 🤖 Agent: `{node_name.upper()}`")
-                        
+                            st.markdown(
+                                f"**🤖 {node_name.replace('_', ' ').title()}**"
+                            )
+
                         with col2:
                             st.caption(f"Step {step_count}")
+
                         
                         if node_name == "supervisor":
-                            next_step = node_output.get('next_step', 'N/A')
-                            task = node_output.get('current_sub_task', 'N/A')
-                            st.markdown(f"**Decision:** {next_step}")
-                            st.markdown(f"**Task:** {task}")
+                            next_step = node_output.get("next_step", "N/A")
+                            task = node_output.get("current_sub_task", "N/A")
+
+                            st.info(
+                                f"**Decision:** {next_step}\n\n"
+                                f"**Task:** {task}"
+    )
                         
                         elif node_name == "researcher":
                             findings = node_output.get('research_findings', [])
@@ -163,6 +370,25 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
                                     st.markdown("**Research:**")
                                     st.info(latest)
                         
+                        elif node_name == "evidence_analyzer":
+                            analysis = node_output.get("evidence_analysis", "")
+
+                            if analysis:
+                                st.success("📊 Evidence analysis completed")
+
+                                preview_length = 350
+
+                                if len(analysis) > preview_length:
+                                    st.markdown("**Evidence Assessment Preview:**")
+                                    st.info(analysis[:preview_length] + "...")
+
+                                    with st.expander(
+                                        f"📖 Show Full Evidence Analysis (Step {step_count})"
+                                    ):
+                                        st.markdown(analysis)
+                                else:
+                                    st.markdown("**Evidence Assessment:**")
+                                    st.info(analysis)
                         elif node_name == "writer":
                             draft = node_output.get('draft', '')
                             revision = node_output.get('revision_number', 0)
@@ -184,9 +410,9 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
                         elif node_name == "critiquer":
                             critique = node_output.get('critique_notes', '')
                             if "APPROVED" in critique.upper():
-                                st.success("✅ Draft APPROVED!")
+                                st.success("✅ Report approved by Critiquer")
                             else:
-                                st.warning("📝 Revisions requested")
+                                st.warning("📝 Revisions requested by Critiquer")
                             
                             # Preview with "Show More" button
                             preview_length = 300
@@ -261,7 +487,7 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
             st.header("📄 Final Research Report")
             
             # Display report in a nice container
-            with st.container():
+            with st.container(border=True):
                 st.markdown(final_draft)
             
             st.divider()
@@ -271,14 +497,35 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
             
             with col1:
                 st.subheader("📊 Report Statistics")
-                revision_count = final_state.get("revision_number", 0) if isinstance(final_state, dict) else 0
-                research_count = len(final_state.get("research_findings", [])) if isinstance(final_state, dict) else 0
+
+                revision_count = (
+                    final_state.get("revision_number", 0)
+                    if isinstance(final_state, dict)
+                    else 0
+                )
+
+                research_count = (
+                    len(final_state.get("research_findings", []))
+                    if isinstance(final_state, dict)
+                    else 0
+                )
+
                 word_count = len(final_draft.split())
-                
-                st.metric("Revisions", revision_count)
-                st.metric("Research Sources", research_count)
-                st.metric("Word Count", word_count)
-                st.metric("Character Count", len(final_draft))
+                character_count = len(final_draft)
+
+                metric1, metric2, metric3, metric4 = st.columns(4)
+
+                with metric1:
+                    st.metric("Revisions", revision_count)
+
+                with metric2:
+                    st.metric("Sources", research_count)
+
+                with metric3:
+                    st.metric("Words", f"{word_count:,}")
+
+                with metric4:
+                    st.metric("Characters", f"{character_count:,}")
             
             with col2:
                 st.subheader("🔍 Research Findings")
@@ -294,8 +541,11 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
                     st.info("No research findings available")
             
             # Download button
+            st.markdown("### 📥 Export Report")
+            st.caption("Save your completed research report for later use.")
+
             st.download_button(
-                label="📥 Download Report",
+                label="📥 Download Research Report",
                 data=final_draft,
                 file_name=f"research_report_{topic.replace(' ', '_')}.txt",
                 mime="text/plain",
