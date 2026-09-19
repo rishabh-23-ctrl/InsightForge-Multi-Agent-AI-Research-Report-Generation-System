@@ -6,9 +6,315 @@ from dotenv import load_dotenv
 from graph import app
 import time
 
+from io import BytesIO
+
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+# from reportlab.lib.pagesizes import A4
+# from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+# from reportlab.lib.enums import TA_LEFT
+# from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+# from reportlab.lib.units import inch
 # Load environment variables
 load_dotenv()
 
+def generate_pdf(report_text):
+    """Generate a formatted PDF from the final research report."""
+    import re
+    import html
+    import markdown
+    from reportlab.platypus import (
+        SimpleDocTemplate,
+        Paragraph,
+        Spacer,
+        Table,
+        TableStyle,
+        KeepTogether
+    )
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import (
+        getSampleStyleSheet,
+        ParagraphStyle
+    )
+    from reportlab.lib.enums import TA_LEFT
+    from reportlab.lib.units import mm
+    from io import BytesIO
+
+    buffer = BytesIO()
+
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=18 * mm,
+        leftMargin=18 * mm,
+        topMargin=18 * mm,
+        bottomMargin=18 * mm
+    )
+
+    styles = getSampleStyleSheet()
+    # Register a Unicode-capable font so characters like
+    # –, —, ’ and • render correctly in the PDF.
+    pdfmetrics.registerFont(
+        TTFont("ArialUnicode", "C:/Windows/Fonts/arial.ttf")
+    )
+
+    pdfmetrics.registerFont(
+        TTFont("ArialUnicodeBold", "C:/Windows/Fonts/arialbd.ttf")
+    )
+
+    title_style = ParagraphStyle(
+        "ReportTitle",
+        parent=styles["Title"],
+        fontName="ArialUnicodeBold",
+        fontSize=20,
+        leading=25,
+        spaceAfter=16,
+        alignment=TA_LEFT
+    )
+
+    heading_style = ParagraphStyle(
+        "ReportHeading",
+        parent=styles["Heading2"],
+        fontName="ArialUnicodeBold",
+        fontSize=14,
+        leading=18,
+        spaceBefore=12,
+        spaceAfter=8
+    )
+
+    subheading_style = ParagraphStyle(
+        "ReportSubHeading",
+        parent=styles["Heading3"],
+        fontName="ArialUnicodeBold",
+        fontSize=12,
+        leading=16,
+        spaceBefore=10,
+        spaceAfter=6
+    )
+
+    body_style = ParagraphStyle(
+        "ReportBody",
+        parent=styles["BodyText"],
+        fontName="ArialUnicode",
+        fontSize=10,
+        leading=14,
+        spaceAfter=7
+    )
+
+    bullet_style = ParagraphStyle(
+        "ReportBullet",
+        parent=body_style,
+        leftIndent=12,
+        firstLineIndent=-7,
+        spaceAfter=5
+    )
+
+    story = []
+
+    lines = report_text.splitlines()
+    i = 0
+
+    while i < len(lines):
+
+        line = lines[i].strip()
+
+        # Empty line
+        if not line:
+            story.append(Spacer(1, 5))
+            i += 1
+            continue
+
+        # Markdown table
+        if (
+            "|" in line
+            and i + 1 < len(lines)
+            and "|" in lines[i + 1]
+            and re.match(r"^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$", lines[i + 1])
+        ):
+            table_data = []
+
+            header = [
+                cell.strip()
+                for cell in line.strip("|").split("|")
+            ]
+
+            table_data.append(header)
+
+            i += 2
+
+            while i < len(lines) and "|" in lines[i]:
+                row = [
+                    cell.strip()
+                    for cell in lines[i].strip("|").split("|")
+                ]
+
+                table_data.append(row)
+                i += 1
+
+            formatted_table = []
+
+            for row_index, row in enumerate(table_data):
+                formatted_row = []
+
+                for cell in row:
+                    cell_html = markdown.markdown(
+                        cell,
+                        extensions=["extra"]
+                    )
+
+                    cell_html = cell_html.replace(
+                        "<p>", ""
+                    ).replace(
+                        "</p>", ""
+                    )
+
+                    if row_index == 0:
+                        cell_style = ParagraphStyle(
+                            "TableHeader",
+                            parent=body_style,
+                            fontName="ArialUnicodeBold",
+                            fontSize=9,
+                            leading=12
+                        )
+                    else:
+                        cell_style = ParagraphStyle(
+                            "TableCell",
+                            parent=body_style,
+                            fontSize=8.5,
+                            leading=11
+                        )
+
+                    formatted_row.append(
+                        Paragraph(cell_html, cell_style)
+                    )
+
+                formatted_table.append(formatted_row)
+
+            available_width = A4[0] - 36 * mm
+
+            column_count = len(table_data[0])
+
+            table = Table(
+                formatted_table,
+                colWidths=[
+                    available_width / column_count
+                ] * column_count,
+                repeatRows=1,
+                hAlign="LEFT"
+            )
+
+            table.setStyle(
+                TableStyle([
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e2e8f0")),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+                    ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                    ("TOPPADDING", (0, 0), (-1, -1), 5),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ])
+            )
+
+            story.append(
+                KeepTogether(table)
+            )
+
+            story.append(Spacer(1, 8))
+            continue
+
+        # H1
+        if line.startswith("# "):
+            text = line[2:]
+            html_text = markdown.markdown(text)
+
+            story.append(
+                Paragraph(
+                    html_text,
+                    title_style
+                )
+            )
+
+        # H2
+        elif line.startswith("## "):
+            text = line[3:]
+            html_text = markdown.markdown(text)
+
+            story.append(
+                Paragraph(
+                    html_text,
+                    heading_style
+                )
+            )
+
+        # H3
+        elif line.startswith("### "):
+            text = line[4:]
+            html_text = markdown.markdown(text)
+
+            story.append(
+                Paragraph(
+                    html_text,
+                    subheading_style
+                )
+            )
+
+        # Bullet list
+        elif line.startswith("- ") or line.startswith("* "):
+            text = line[2:]
+            html_text = markdown.markdown(text)
+
+            story.append(
+                Paragraph(
+                    f"• {html_text}",
+                    bullet_style
+                )
+            )
+
+        # Numbered list
+        elif re.match(r"^\d+\.\s+", line):
+            match = re.match(r"^(\d+)\.\s+(.*)", line)
+
+            number = match.group(1)
+            text = match.group(2)
+
+            html_text = markdown.markdown(text)
+
+            story.append(
+                Paragraph(
+                    f"{number}. {html_text}",
+                    body_style
+                )
+            )
+
+        # Normal paragraph
+        else:
+            html_text = markdown.markdown(
+                line,
+                extensions=["extra"]
+            )
+
+            html_text = html_text.replace(
+                "<p>", ""
+            ).replace(
+                "</p>", ""
+            )
+
+            story.append(
+                Paragraph(
+                    html_text,
+                    body_style
+                )
+            )
+
+        i += 1
+
+    doc.build(story)
+
+    buffer.seek(0)
+
+    return buffer.getvalue()
 # --- Page Configuration ---
 st.set_page_config(
     page_title="InsightForge | AI Research",
@@ -544,11 +850,13 @@ if st.button("🚀 Start Research", type="primary", use_container_width=True):
             st.markdown("### 📥 Export Report")
             st.caption("Save your completed research report for later use.")
 
+            pdf_data = generate_pdf(final_draft)
+
             st.download_button(
-                label="📥 Download Research Report",
-                data=final_draft,
-                file_name=f"research_report_{topic.replace(' ', '_')}.txt",
-                mime="text/plain",
+                label="📄 Download Research Report (PDF)",
+                data=pdf_data,
+                file_name=f"research_report_{topic.replace(' ', '_')}.pdf",
+                mime="application/pdf",
                 use_container_width=True
             )
         else:
