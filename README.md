@@ -28,13 +28,11 @@ The project is designed around an autonomous workflow where a **Supervisor Agent
 ⚙️ Configurable maximum workflow iterations
 
 ---
-
 ## 📁 Project Structure
 
 ```text
 InsightForge/
-├── assets/
-│   └── research_graph.png
+├── assets
 ├── .env
 ├── requirements.txt
 ├── prompts.py
@@ -43,7 +41,9 @@ InsightForge/
 ├── visualize_graph.py
 ├── app.py
 └── README.md
+```
 ---
+
 ## Installation
 
 ### 1. Clone the Repository
