@@ -1,255 +1,41 @@
-# 🔍 InsightForge — Multi-Agent AI Research & Report Generation System
+# InsightForge — Multi-Agent AI Research & Report Generation System
 
-InsightForge is a collaborative **multi-agent AI research system** built with **LangChain**, **LangGraph**, **Groq**, and **Tavily**.
+A collaborative **multi-agent AI research system** built using **LangChain**, **LangGraph**, **Groq**, and **Tavily**, designed to generate detailed and well-structured research reports through intelligent agent cooperation.
 
-It uses a team of specialized AI agents to research a topic, evaluate the gathered evidence, generate a structured report, critique the report, and iteratively refine it until the report is approved.
+InsightForge uses multiple specialized AI agents to research a topic, evaluate the gathered evidence, generate a structured report, critique the report, and iteratively refine it until the report is approved.
 
 The project is designed around an autonomous workflow where a **Supervisor Agent coordinates the specialized agents and controls the execution flow**.
 
 ![LangGraph Architecture](assets/research_graph.png)
 
-*Multi-agent research workflow built with LangGraph.*
+*System architecture built with LangGraph illustrating multi-agent collaboration.*
 
 ---
-
 ## 🚀 Features
 
-- 🤖 Multi-agent AI research workflow
-- 🎯 Supervisor-based agent orchestration
-- 🔎 Web research using Tavily
-- 📊 Dedicated Evidence Analyzer Agent
-- ✍️ Automated research report generation
-- 🔍 Automated report critique and revision
-- 🔄 Iterative refinement loop
-- 📚 Source collection and tracking
-- 📈 Research workflow activity display
-- 📊 Report statistics
-- 🖥️ Interactive Streamlit dashboard
-- 📄 PDF report export
-- 🔤 Unicode-safe PDF rendering
-- ⚙️ Configurable maximum workflow iterations
+🤖 Multi-agent AI research workflow
+🎯 Supervisor-based agent orchestration
+🔎 Web research using Tavily
+📊 Dedicated Evidence Analyzer Agent
+✍️ Automated research report generation
+🔍 Automated report critique and revision
+🔄 Iterative refinement loop
+📚 Source collection and tracking
+📈 Research workflow activity display
+📊 Report statistics
+🖥️ Interactive Streamlit dashboard
+📄 PDF report export
+🔤 Unicode-safe PDF rendering
+⚙️ Configurable maximum workflow iterations
 
 ---
 
-## 🏗️ System Architecture
-
-InsightForge currently uses five specialized agents:
+## 📁 Project Structure
 
 ```text
-                    ┌─────────────────┐
-                    │    Supervisor   │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │    Researcher   │
-                    └────────┬────────┘
-                             │
-                             ▼
-                 ┌──────────────────────┐
-                 │  Evidence Analyzer   │
-                 └──────────┬───────────┘
-                            │
-                            ▼
-                    ┌─────────────────┐
-                    │    Supervisor   │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │      Writer     │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │    Critiquer    │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │    Supervisor   │
-                    └────────┬────────┘
-                             │
-                  ┌──────────┴──────────┐
-                  ▼                     ▼
-                END                  Writer
-                                      │
-                                      └──► Revision Loop
-Workflow
-Supervisor
-    ↓
-Researcher
-    ↓
-Evidence Analyzer
-    ↓
-Supervisor
-    ↓
-Writer
-    ↓
-Critiquer
-    ↓
-Supervisor
-    ↓
-END / Writer
-
-The Supervisor dynamically determines the next step based on the current workflow state.
-
-If the Critiquer requests improvements, the report is sent back to the Writer for revision.
-
-🤖 Agents
-1. 🎯 Supervisor Agent
-
-The Supervisor coordinates the entire research workflow.
-
-Responsibilities:
-
-Determines which agent should execute next
-Routes tasks between agents
-Tracks workflow state
-Controls the revision loop
-Determines when the report is ready to finish
-
-The Supervisor can route execution to:
-
-Researcher
-Evidence Analyzer
-Writer
-END
-2. 🔎 Researcher Agent
-
-The Researcher gathers information from the web using Tavily.
-
-Responsibilities:
-
-Searches for relevant information
-Collects research findings
-Extracts source URLs
-Produces concise research summaries
-Provides evidence for downstream agents
-
-The Researcher returns both:
-
-Research Findings
-Sources
-3. 📊 Evidence Analyzer Agent
-
-The Evidence Analyzer evaluates the quality and reliability of the collected research.
-
-Responsibilities:
-
-Identifies important claims
-Distinguishes stronger evidence from weaker evidence
-Identifies supporting sources
-Detects contradictions and evidence gaps
-Highlights limitations and uncertainty
-Produces an evidence assessment for the Writer
-
-This additional analysis layer helps prevent the Writer from simply summarizing search results without evaluating their evidentiary strength.
-
-4. ✍️ Writer Agent
-
-The Writer generates the final research report using:
-
-Research findings
-Collected sources
-Evidence analysis
-Critiquer feedback
-
-Reports are structured around sections such as:
-
-Executive Summary
-Introduction
-Key Findings
-Evidence Analysis
-Detailed Analysis
-Limitations
-Conclusion
-Sources
-
-When the Critiquer requests revisions, the Writer generates a complete revised version of the report.
-
-5. 🔍 Critiquer Agent
-
-The Critiquer evaluates the generated report.
-
-Responsibilities:
-
-Reviews report quality
-Identifies weaknesses
-Checks structure and clarity
-Provides revision feedback
-Approves the report when requirements are satisfied
-
-The Critiquer controls whether the workflow should finish or continue through another revision cycle.
-
-🖥️ Streamlit Dashboard
-
-InsightForge includes an interactive Streamlit dashboard for running the research workflow.
-
-The dashboard provides:
-
-Research Configuration
-
-Users can enter a research topic and configure the maximum number of workflow iterations.
-
-Autonomous Research Pipeline
-
-The interface displays the five-agent pipeline:
-
-Supervisor
-Researcher
-Evidence Analyzer
-Writer
-Critiquer
-Agent Activity
-
-The dashboard displays live workflow activity including:
-
-Current agent
-Workflow step
-Supervisor decisions
-Research completion
-Evidence analysis
-Writer revisions
-Critiquer feedback/approval
-Report Statistics
-
-The completed report displays:
-
-Number of revisions
-Number of research sources/findings
-Word count
-Character count
-📄 PDF Export
-
-After the research workflow completes, the final report can be downloaded as a PDF.
-
-The PDF is generated directly from the final report content and supports Markdown-style formatting including:
-
-Headings
-Bold text
-Bullet lists
-Numbered lists
-Tables
-Source sections
-
-The PDF generator also uses a Unicode-capable font so characters such as:
-
-–
-—
-’
-•
-
-render correctly instead of appearing as unsupported-character squares.
-
-The exported PDF uses the same final_draft that is displayed in the dashboard, keeping the final report as the single source of truth.
-
-📁 Project Structure
 InsightForge/
-│
 ├── assets/
 │   └── research_graph.png
-│
 ├── .env
 ├── requirements.txt
 ├── prompts.py
@@ -258,197 +44,230 @@ InsightForge/
 ├── visualize_graph.py
 ├── app.py
 └── README.md
-File Responsibilities
-File	Purpose
-app.py	Streamlit dashboard and PDF export
-agents.py	AI agents, LLM configuration, Tavily research
-graph.py	LangGraph workflow and state management
-prompts.py	Agent prompt templates
-visualize_graph.py	Generates the LangGraph workflow visualization
-requirements.txt	Python dependencies
-assets/	Architecture and graph visualizations
-.env	API keys and environment configuration
-🛠️ Technology Stack
-Technology	Purpose
-Python	Core programming language
-LangChain	LLM and agent framework
-LangGraph	Multi-agent workflow orchestration
-Groq	LLM inference
-openai/gpt-oss-20b	Current Groq model
-Tavily	Web research and search
-Streamlit	Interactive web dashboard
-ReportLab	PDF generation
-Python-Markdown	Markdown processing
-Graphviz	Optional workflow visualization
-⚙️ Installation
-Prerequisites
-Python 3.11+
-pip
-Git
-Groq API key
-Tavily API key
-Graphviz (optional, only required for graph visualization)
-1. Clone the Repository
+## Installation
+
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/rishabh-23-ctrl/InsightForge-Multi-Agent-AI-Research-Report-Generation-System.git
+```
 
 Navigate into the project:
 
+```bash
 cd InsightForge-Multi-Agent-AI-Research-Report-Generation-System
-2. Create a Virtual Environment
-Windows
+```
+
+### 2. Create a Virtual Environment
+
+For Python 3.11:
+
+```bash
 py -3.11 -m venv venv
+```
 
-Activate it:
+Activate the virtual environment on Windows:
 
+```bash
 venv\Scripts\activate
-macOS / Linux
-python3.11 -m venv venv
-source venv/bin/activate
-3. Install Dependencies
+```
+
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
-🔑 Environment Configuration
+```
 
-Create a .env file in the project root:
+### 4. Configure Environment Variables
 
-GROQ_API_KEY=your_groq_api_key_here
-TAVILY_API_KEY=your_tavily_api_key_here
-Groq API Key
+Create a `.env` file in the project root:
 
-Create a Groq API key from:
+```env
+GROQ_API_KEY=your_groq_api_key
+TAVILY_API_KEY=your_tavily_api_key
+```
 
-https://console.groq.com/
+Replace the placeholder values with your own API keys.
 
-Tavily API Key
-
-Create a Tavily API key from:
-
-https://tavily.com/
-
-Never commit your .env file or expose your API keys publicly.
-
-▶️ Running the Application
+### 5. Run the Application
 
 Start the Streamlit application:
 
+```bash
 streamlit run app.py
+```
 
+The application will open in your browser at:
 
-Enter a research topic and click:
+```text
+http://localhost:8501
+```
 
-🚀 Start Research
+---
+## 🏗️ System Architecture
 
-InsightForge will then execute the multi-agent workflow.
+The complete InsightForge workflow is coordinated using LangGraph.
 
-📊 Generate Workflow Visualization
-
-The project includes a script for generating the LangGraph architecture visualization.
-
-Run:
-
-python visualize_graph.py
-
-The generated visualization is saved inside:
-
-assets/
-
-Graphviz is optional and is not required to run the Streamlit application.
-
-🔄 Research Workflow Example
-
-For a topic such as:
-
-Impact of Generative AI on Software Development
-
-the system follows this process:
-
-1. Supervisor
-   ↓
-2. Researcher
-   ↓
-3. Evidence Analyzer
-   ↓
-4. Supervisor
-   ↓
-5. Writer
-   ↓
-6. Critiquer
-   ↓
-7. Supervisor
-   ↓
-8. END or Writer
-
-If revisions are requested:
-
-Writer
-   ↓
-Critiquer
-   ↓
+```text
+Start
+  |
+  v
 Supervisor
-   ↓
+  |
+  v
+Researcher
+  |
+  v
+Evidence Analyzer
+  |
+  v
+Supervisor
+  |
+  v
 Writer
+  |
+  v
+Critiquer
+  |
+  v
+Supervisor
+  |
+  +----> Approved ----> END
+  |
+  +----> Revision Required ----> Writer
+```
 
-This continues until the Critiquer approves the report or the configured workflow iteration limit is reached.
+### Workflow Stages
 
-🧠 State Management
+1. **Supervisor** receives the research task and determines the next agent.
+2. **Researcher** searches the web and collects relevant findings and sources.
+3. **Evidence Analyzer** evaluates the collected research and identifies evidence quality, gaps, contradictions, and uncertainty.
+4. **Supervisor** routes the workflow toward report generation.
+5. **Writer** generates the initial research report.
+6. **Critiquer** reviews the report and provides feedback.
+7. **Supervisor** evaluates the critique result.
+8. If the report is approved, the workflow ends.
+9. If revisions are required, the Writer receives the feedback and generates an improved version.
+10. The revision cycle continues until the report is approved or the configured workflow limit is reached.
 
-The LangGraph workflow maintains shared state containing information such as:
+### Streamlit Dashboard
 
-main_task
-research_findings
-sources
-evidence_analysis
-draft
-critique_notes
-revision_number
-next_step
-current_sub_task
+The Streamlit interface provides visibility into the workflow while it is running.
 
-This shared state allows the specialized agents to collaborate while maintaining context throughout the workflow.
+The dashboard displays:
 
-📋 Report Output
+- Research topic input
+- Configurable workflow iterations
+- Agent activity
+- Supervisor decisions
+- Evidence analysis
+- Writer revisions
+- Critiquer feedback
+- Final report
+- Report statistics
+- Research evidence
+- PDF export
 
-The generated report is designed to contain:
+---
+## Tech Stack
 
-Executive Summary
-Introduction
-Key Findings
-Evidence Analysis
-Detailed Analysis
-Limitations
-Conclusion
-Sources
+| Technology | Purpose |
+|---|---|
+| Python | Core programming language |
+| LangChain | LLM and agent integration |
+| LangGraph | Multi-agent workflow orchestration |
+| Groq | LLM inference |
+| Tavily | Web research and source discovery |
+| Streamlit | Interactive web dashboard |
+| ReportLab | PDF generation |
+| Markdown | Report formatting |
+| python-dotenv | Environment variable management |
 
-The final report is displayed directly in the Streamlit dashboard.
+## Troubleshooting
 
-It can also be exported as a PDF using:
+### API Key Error
 
-📄 Download Research Report (PDF)
+If the application reports that API keys are missing, verify that the `.env` file exists in the project root and contains:
 
+```env
+GROQ_API_KEY=your_groq_api_key
+TAVILY_API_KEY=your_tavily_api_key
+```
 
-🎯 Project Goal
+### Dependency Installation Issues
 
-InsightForge aims to demonstrate how multiple specialized AI agents can collaborate through a structured workflow rather than relying on a single LLM call.
+Make sure the virtual environment is activated before installing dependencies:
 
-The system separates:
+```bash
+venv\Scripts\activate
+```
 
-Research
-   ↓
-Evidence Evaluation
-   ↓
-Report Generation
-   ↓
-Quality Review
-   ↓
-Revision
+Then run:
 
-This architecture makes the research process more modular, observable, and extensible.
+```bash
+pip install -r requirements.txt
+```
 
-👨‍💻 Author
+### Streamlit Application Does Not Start
 
-Rishabh Tiwari
+Verify that Streamlit is installed and run:
 
-BTech Information Technology Student
+```bash
+streamlit run app.py
+```
 
-GitHub:
+### API Rate or Usage Limits
 
-https://github.com/rishabh-23-ctrl
+The application depends on external APIs for LLM inference and web research. API usage limits can prevent individual agents from completing their tasks.
+
+If an API limit is reached, wait for the provider's usage window to reset and run the workflow again.
+
+---
+
+## Project State
+
+The current implementation provides an end-to-end multi-agent research workflow with:
+
+- Supervisor orchestration
+- Web research
+- Evidence analysis
+- Report generation
+- Automated critique
+- Iterative revision
+- Streamlit monitoring
+- Research evidence tracking
+- PDF report export
+
+The project is being developed incrementally, with additional production-oriented features planned for future phases.
+
+---
+## 🎯 Project Goal
+
+The goal of InsightForge is to demonstrate how multiple specialized AI agents can collaborate through a structured workflow to perform research, evaluate evidence, generate reports, and iteratively improve their output.
+
+The project focuses on combining:
+
+- Agentic AI
+- LLM engineering
+- Multi-agent orchestration
+- Web research
+- Evidence evaluation
+- Automated report generation
+- Human-readable reporting
+- Interactive AI applications
+
+---
+
+## 👨‍💻 Author
+
+**Rishabh Tiwari**
+
+BTech IT Student | AI/ML | LLM Engineering | Generative AI
+
+---
+
+## License
+
+This project is intended for educational and portfolio purposes.
+
+---
