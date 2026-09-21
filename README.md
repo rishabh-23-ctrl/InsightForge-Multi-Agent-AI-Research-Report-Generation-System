@@ -6,7 +6,6 @@ InsightForge uses multiple specialized AI agents to research a topic, evaluate t
 
 The project is designed around an autonomous workflow where a **Supervisor Agent coordinates the specialized agents and controls the execution flow**.
 
-![LangGraph Architecture](assets/research_graph.png)
 
 *System architecture built with LangGraph illustrating multi-agent collaboration.*
 
@@ -44,6 +43,7 @@ InsightForge/
 ├── visualize_graph.py
 ├── app.py
 └── README.md
+---
 ## Installation
 
 ### 1. Clone the Repository
